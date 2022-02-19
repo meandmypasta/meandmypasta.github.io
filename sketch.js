@@ -17,9 +17,9 @@ function setup() {
   world = new World();
   
   
-  char_sprite_arr = load_tile_arr(10, 10, char_sprites, sprites_png);
+  char_sprite_arr = load_tile_arr(40, 40, CHAR_SPRITES_CONFIG, sprites_png);
   
-  current_env = new GridEnvironment(world, env_tiles, home_map);
+  current_env = new GridEnvironment(world, ENV_TILES_CONFIG, home_map);
 
   
   player = new SpriteCharacter(world,
@@ -28,7 +28,8 @@ function setup() {
                                25, // width
                                25, // height
                                5, // step size
-                               player_sprites);
+                               player_sprites,
+                               'blue');
   world.player = player;
   world.char_sprite_arr = char_sprite_arr;
   world.current_env = current_env;
@@ -42,6 +43,10 @@ function setup() {
   
 
 function draw() {
+    if (touches.length > 0) {
+        background(255, 0, 0)
+    }
+
     if (counter % 5 == 0 && pressed_key != null) {
         key_action(pressed_key)
     }   
@@ -67,19 +72,22 @@ function key_action(key) {
     };
 
     if (key in key_direction_map) {
-        world.player.move(key_direction_map[key]);
-
-        world.player.draw_object();
+        moved = world.player.move(key_direction_map[key]);
 
         var passage = world.current_env.check_passage(world.player);
 
         if (passage != null) {
             env_dict = map_registry[passage.destination_id];
-            world.current_env = new GridEnvironment(world, env_tiles, env_dict);
+            if ('scrolling' in env_dict) {
+                world.current_env = new ScrollingGridEnvironment(world, ENV_TILES_CONFIG, env_dict);
+            } else {
+                world.current_env = new GridEnvironment(world, ENV_TILES_CONFIG, env_dict);
+            }
+            resetMatrix() // undo effects of scrolling env translation
             world.current_env.draw_environment();
             world.current_env.draw_contents();
-            world.player.x = passage.new_x
-            world.player.y = passage.new_y
+            world.player.x = passage.new_x;
+            world.player.y = passage.new_y;
             world.player.draw_object();
         }
         return
@@ -130,6 +138,7 @@ function draw_scene() {
     world.player.draw_object();
 }
             
-    
-
-
+function mouseClicked() {
+    grid_pos = world.current_env.to_grid_coordinates({x: mouseX, y: mouseY})
+    console.log(world.current_env.add_offset(grid_pos))
+}
