@@ -51,8 +51,10 @@ function setup() {
   
 
 function draw() {
-    if (touches.length > 0 || true) {
-        draw_ctrl_buttons()
+    if (touches.length > 0) {
+        for (var i = 0; i < touches.length; i++) {
+            touch_action(touches[i])
+        }
     }
 
     if (counter % 5 == 0 && pressed_key != null) {
