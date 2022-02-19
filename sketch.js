@@ -52,6 +52,7 @@ function setup() {
 
 function draw() {
     if (touches.length > 0) {
+        draw_ctrl_buttons()
         for (var i = 0; i < touches.length; i++) {
             touch_action(touches[i])
         }
