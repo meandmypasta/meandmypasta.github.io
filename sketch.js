@@ -8,6 +8,14 @@ function preload() {
   sprites_png = loadImage("data/character_sprites.png")
 }
 
+let ctrl_buttons = [
+    new RectButton(dir_button_x_offset, dir_button_y_offset + dir_button_dim, dir_button_dim, dir_button_dim, key_action, 'a'),
+    new RectButton(dir_button_x_offset + dir_button_dim, dir_button_y_offset, dir_button_dim, dir_button_dim, key_action, 'w'),
+    new RectButton(dir_button_x_offset + dir_button_dim, dir_button_y_offset + 2 * dir_button_dim, dir_button_dim, dir_button_dim, key_action, 's'),
+    new RectButton(dir_button_x_offset + 2 * dir_button_dim, dir_button_y_offset + dir_button_dim, dir_button_dim, dir_button_dim, key_action, 'd'),
+    new RectButton(dir_button_x_offset + 5 * dir_button_dim, dir_button_y_offset + 2 * dir_button_dim, dir_button_dim * 4, dir_button_dim, key_action, ' ')
+]
+
 function setup() {
 
   createCanvas(600, 450);
@@ -43,8 +51,8 @@ function setup() {
   
 
 function draw() {
-    if (touches.length > 0) {
-        background(255, 0, 0)
+    if (touches.length > 0 || true) {
+        draw_ctrl_buttons()
     }
 
     if (counter % 5 == 0 && pressed_key != null) {
@@ -59,6 +67,18 @@ function draw() {
     }
 
     counter += 1
+}
+
+function touch_action(touch) {
+    for (var i = 0; i < ctrl_buttons.length; i++) {
+        ctrl_buttons[i].try_press(touch)
+    }  
+}
+
+function draw_ctrl_buttons() {
+    for (var i = 0; i < ctrl_buttons.length; i++) {
+        ctrl_buttons[i].draw_button()
+    }  
 }
 
 function key_action(key) {
@@ -141,4 +161,6 @@ function draw_scene() {
 function mouseClicked() {
     grid_pos = world.current_env.to_grid_coordinates({x: mouseX, y: mouseY})
     console.log(world.current_env.add_offset(grid_pos))
+
+    touch_action({x: mouseX, y: mouseY})
 }
