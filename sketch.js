@@ -1,6 +1,7 @@
 
 let pressed_key;
 let counter = 0
+let player_time_constant = 5
 class World {}
 
 function preload() {
@@ -46,11 +47,14 @@ function setup() {
   current_env.draw_environment();
   current_env.draw_contents();
   world.player.draw_object();
-
+  push()
 }
   
 
 function draw() {
+    pop()
+
+    // draw touch buttons and execute if pressed
     if (touches.length > 0) {
         draw_ctrl_buttons()
         for (var i = 0; i < touches.length; i++) {
@@ -58,18 +62,23 @@ function draw() {
         }
     }
 
-    if (counter % 5 == 0 && pressed_key != null) {
+    // if key pressed, and if counter condition met, execute key actions
+    if (counter % player_time_constant == 0 && pressed_key != null) {
         key_action(pressed_key)
     }   
 
+    // update environment contents if no text boxes / canvases are displayed
     if (world.text_instance == null) {
         world.current_env.update_contents();
     }
+
+    // if it exists, update current canvas
     if (world.canvas_instance != null) {
         world.canvas_instance.draw_canvas();
     }
 
     counter += 1
+    push()
 }
 
 function touch_action(touch) {
@@ -85,7 +94,6 @@ function draw_ctrl_buttons() {
 }
 
 function key_action(key) {
-    
 
     var key_direction_map = {
         'w': 'up',
@@ -94,7 +102,7 @@ function key_action(key) {
         'a': 'left'
     };
 
-    if (key in key_direction_map) {
+    if (key in key_direction_map && world.text_instance == null && world.canvas_instance == null) {
         moved = world.player.move(key_direction_map[key]);
 
         var passage = world.current_env.check_passage(world.player);
@@ -117,7 +125,7 @@ function key_action(key) {
     } 
     
     if (key == ' ') {
-        if ((world.text_instance == null) & (world.canvas_instance == null)) {
+        if ((world.text_instance == null) && (world.canvas_instance == null)) {
             world.current_env.interact(world.player);
           return
         }
